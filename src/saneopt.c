@@ -28,7 +28,6 @@ void saneopt_alias(saneopt_t* opt, char* option, char* alias) {
 char* saneopt_get(saneopt_t* opt, char* name) {
   int i;
   char* arg;
-  char* result;
 
   for (i = 0; i < opt->argc; i++) {
     arg = opt->argv[i];
