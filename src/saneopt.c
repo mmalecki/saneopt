@@ -25,28 +25,18 @@ void saneopt_alias(saneopt_t* opt, char* option, char* alias) {
   opt->aliases[opt->alias_count - 1] = alias_;
 }
 
-int saneopt_empty(saneopt_arg_t* arg) {
-  return arg == NULL || arg->value == NULL;
-}
-
-saneopt_arg_t* saneopt_get(saneopt_t* opt, char* name) {
-  int i, argc;
+char* saneopt_get(saneopt_t* opt, char* name) {
+  int i;
   char* arg;
-  char** argv;
-  saneopt_arg_t* result;
+  char* result;
 
-  argc = opt->argc;
-  argv = opt->argv;
-
-  for (i = 0; i < argc; i++) {
-    arg = argv[i];
+  for (i = 0; i < opt->argc; i++) {
+    arg = opt->argv[i];
     if (strncmp(arg, "--", 2) == 0) {
       if (strcmp(arg + 2, name) == 0) {
-        result = malloc(sizeof(saneopt_arg_t));
-        if ((i + 1) < argc && argv[i + 1][0] != '-') {
-          result->value = argv[i + 1];
-          return result;
-        }
+        return ((i + 1) < opt->argc && opt->argv[i + 1][0] != '-')
+          ? opt->argv[i + 1]
+          : "";
       }
     }
   }
