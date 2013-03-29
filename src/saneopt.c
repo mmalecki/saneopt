@@ -3,7 +3,7 @@
 
 #include "../include/saneopt.h"
 
-saneopt_t* saneopt_new(int argc, char** argv) {
+saneopt_t* saneopt_init(int argc, char** argv) {
   saneopt_t* saneopt = malloc(sizeof(saneopt_t));
   saneopt->argc = argc;
   saneopt->argv = argv;

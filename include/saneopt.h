@@ -17,7 +17,7 @@ struct saneopt {
 /*
  * Create a new `saneopt` parser.
  */
-saneopt_t* saneopt_new(int argc, char** argv);
+saneopt_t* saneopt_init(int argc, char** argv);
 
 /*
  * Set an alias from `old` to `new`.
