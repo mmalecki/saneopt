@@ -1,0 +1,4 @@
+*.o
+test/test-saneopt
+libsaneopt.a
+.*.sw[op]
