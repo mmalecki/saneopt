@@ -31,6 +31,21 @@ int saneopt__matches(saneopt_t* opt, char* name, char* arg) {
       }
     }
   }
+  else if (strncmp(arg, "-", 1) == 0) {
+    ++arg;
+
+    if (strcmp(arg, name) == 0) {
+      return 1;
+    }
+
+    for (i = 0; opt->aliases && i < opt->alias_count; i++) {
+      if (strcmp(opt->aliases[i]->option, name) == 0 &&
+          strlen(opt->aliases[i]->alias) == 1 &&
+          strcmp(arg, opt->aliases[i]->alias) == 0) {
+        return 1;
+      }
+    }
+  }
 
   return 0;
 }
