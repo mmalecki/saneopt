@@ -62,7 +62,7 @@ void test_long_alias() {
   argv[2] = "value";
 
   saneopt_t* opt = saneopt_init(3, argv);
-  saneopt_alias(opt, "option", "alias");
+  assert(saneopt_alias(opt, "option", "alias") == 0);
   assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
 
   free(argv);
@@ -78,7 +78,7 @@ void test_short_alias() {
   argv[1] = "value";
 
   saneopt_t* opt = saneopt_init(2, argv);
-  saneopt_alias(opt, "option", "o");
+  assert(saneopt_alias(opt, "option", "o") == 0);
   assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
 
   free(argv);

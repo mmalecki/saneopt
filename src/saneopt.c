@@ -50,16 +50,25 @@ int saneopt__matches(saneopt_t* opt, char* option, char* arg) {
   return 0;
 }
 
-void saneopt_alias(saneopt_t* opt, char* option, char* alias) {
+int saneopt_alias(saneopt_t* opt, char* option, char* alias) {
+  saneopt__alias_t** aliases;
   saneopt__alias_t* alias_ = malloc(sizeof(saneopt__alias_t));
+
   alias_->option = option;
   alias_->alias = alias;
 
-  opt->aliases = realloc(
+  aliases = realloc(
     opt->aliases,
     ++opt->alias_count * sizeof(saneopt__alias_t*)
   );
+
+  if (aliases == NULL)
+    return -1;
+
+  opt->aliases = aliases;
   opt->aliases[opt->alias_count - 1] = alias_;
+
+  return 0;
 }
 
 char* saneopt_get(saneopt_t* opt, char* option) {

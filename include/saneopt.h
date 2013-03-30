@@ -21,8 +21,9 @@ saneopt_t* saneopt_init(int argc, char** argv);
 
 /*
  * Set an alias from `option` to `alias`.
+ * Return -1 on error, 0 on success.
  */
-void saneopt_alias(saneopt_t* opt, char* option, char* alias);
+int saneopt_alias(saneopt_t* opt, char* option, char* alias);
 
 /*
  * Get option called `option`.
