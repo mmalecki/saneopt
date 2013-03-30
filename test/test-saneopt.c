@@ -85,12 +85,32 @@ void test_short_alias() {
   free(opt);
 }
 
+void test_stop_after_arguments() {
+  printf("test_stop_after_arguments()\n");
+
+  char** argv = malloc(5 * sizeof(char*));
+
+  argv[0] = "--option";
+  argv[1] = "value";
+  argv[2] = "--";
+  argv[3] = "--next-option";
+  argv[4] = "value";
+
+  saneopt_t* opt = saneopt_init(5, argv);
+  assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
+  assert(saneopt_get(opt, "next-option") == NULL);
+
+  free(argv);
+  free(opt);
+}
+
 int main(int argc, char** argv) {
   test_no_arg();
   test_no_value();
   test_value();
   test_long_alias();
   test_short_alias();
+  test_stop_after_arguments();
 
   return 0;
 }

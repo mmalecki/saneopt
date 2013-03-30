@@ -68,6 +68,10 @@ char* saneopt_get(saneopt_t* opt, char* option) {
 
   for (i = 0; i < opt->argc; i++) {
     arg = opt->argv[i];
+
+    if (strcmp(arg, "--") == 0)
+      return NULL;
+
     if (saneopt__matches(opt, option, arg)) {
       return ((i + 1) < opt->argc && opt->argv[i + 1][0] != '-')
         ? opt->argv[i + 1]
