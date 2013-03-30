@@ -29,4 +29,16 @@ void saneopt_alias(saneopt_t* opt, char* option, char* alias);
  */
 char* saneopt_get(saneopt_t* opt, char* option);
 
+/*
+ * Get command line arguments, that is: any arguments not being an argument
+ * value and all arguments after "--".
+ *
+ * For example, parsing:
+ *
+ *   ./app --option value foo bar -- --not-option baz
+ *
+ * Will result in this function returning ["foo", "bar", "--not-option", "baz"].
+ */
+char** saneopt_arguments(saneopt_t* opt);
+
 #endif
