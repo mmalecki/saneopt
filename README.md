@@ -1,4 +1,4 @@
-# `env`
+# saneopt 
 A C command line option parser. Named `saneopt`, because, as opposed to `getopt`
 it's actually mostly sane.
 
