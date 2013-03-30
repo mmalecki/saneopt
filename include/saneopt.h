@@ -31,6 +31,21 @@ int saneopt_alias(saneopt_t* opt, char* option, char* alias);
 char* saneopt_get(saneopt_t* opt, char* option);
 
 /*
+ * Get all values for option called `option`.
+ * Return value is a NULL-terminated array.
+ *
+ * For example, getting all values for "option", with the following args:
+ *
+ *   ./app --option first --option second
+ *
+ * Will return ["first", "second"].
+ *
+ * If a occurrence is lacking a value (e.g. `--option --next-option`), it'll be
+ * set to "".
+ */
+char** saneopt_get_all(saneopt_t* opt, char* option);
+
+/*
  * Get command line arguments, that is: any arguments not being an argument
  * value and all arguments after "--".
  * Return value is a NULL-terminated array.

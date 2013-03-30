@@ -129,6 +129,28 @@ void test_arguments() {
   free(opt);
 }
 
+void test_all() {
+  printf("test_all()\n");
+
+  char** argv = malloc(4 * sizeof(char*));
+  char** args;
+
+  argv[0] = "--option";
+  argv[1] = "first";
+  argv[2] = "--option";
+  argv[3] = "second";
+
+  saneopt_t* opt = saneopt_init(4, argv);
+  args = saneopt_get_all(opt, "option");
+  assert(strcmp(args[0], "first") == 0);
+  assert(strcmp(args[1], "second") == 0);
+  assert(args[2] == NULL);
+
+  free(argv);
+  free(opt);
+  free(args);
+}
+
 int main(int argc, char** argv) {
   test_no_arg();
   test_no_value();
@@ -137,6 +159,7 @@ int main(int argc, char** argv) {
   test_short_alias();
   test_stop_after_arguments();
   test_arguments();
+  test_all();
 
   return 0;
 }
