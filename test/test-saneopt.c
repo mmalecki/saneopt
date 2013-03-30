@@ -108,8 +108,7 @@ void test_arguments() {
   printf("test_arguments()\n");
 
   char** argv = malloc(6 * sizeof(char*));
-  char** args = NULL;
-  int argc;
+  char** args;
 
   argv[0] = "--option";
   argv[1] = "value";
@@ -119,12 +118,12 @@ void test_arguments() {
   argv[5] = "arg2";
 
   saneopt_t* opt = saneopt_init(6, argv);
-  argc = saneopt_arguments(opt, &args);
+  args = saneopt_arguments(opt);
   assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
-  assert(argc == 3);
   assert(strcmp(args[0], "arg0") == 0);
   assert(strcmp(args[1], "arg1") == 0);
   assert(strcmp(args[2], "arg2") == 0);
+  assert(args[3] == NULL);
 
   free(argv);
   free(opt);

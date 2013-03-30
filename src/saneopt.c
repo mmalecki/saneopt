@@ -82,9 +82,10 @@ char* saneopt_get(saneopt_t* opt, char* option) {
   return NULL;
 }
 
-int saneopt_arguments(saneopt_t* opt, char*** arguments) {
+char** saneopt_arguments(saneopt_t* opt) {
   int i, count = 0, saw_marker = 0, saw_option = 0, saw_value = 0;;
   char* arg;
+  char** result = NULL;
 
   for (i = 0; i < opt->argc; i++) {
     arg = opt->argv[i];
@@ -103,11 +104,16 @@ int saneopt_arguments(saneopt_t* opt, char*** arguments) {
       continue;
     }
     else if (saw_value || saw_marker || !saw_option) {
-      *arguments = realloc(*arguments, sizeof(char*) * ++count);
-      (*arguments)[count - 1] = arg;
+      result = realloc(result, sizeof(char*) * (++count + 1));
+
+      if (result == NULL)
+        return NULL;
+
+      result[count - 1] = arg;
+      result[count] = NULL;
       saw_value = 0;
     }
   }
 
-  return count;
+  return result;
 }
