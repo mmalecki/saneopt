@@ -81,3 +81,33 @@ char* saneopt_get(saneopt_t* opt, char* option) {
 
   return NULL;
 }
+
+int saneopt_arguments(saneopt_t* opt, char*** arguments) {
+  int i, count = 0, saw_marker = 0, saw_option = 0, saw_value = 0;;
+  char* arg;
+
+  for (i = 0; i < opt->argc; i++) {
+    arg = opt->argv[i];
+
+    if (strcmp(arg, "--") == 0) {
+      saw_marker = 1;
+      continue;
+    }
+    else if (strncmp(arg, "-", 1) == 0) {
+      saw_option = 1;
+      continue;
+    }
+    else if (saw_option) {
+      saw_option = 0;
+      saw_value = 1;
+      continue;
+    }
+    else if (saw_value || saw_marker || !saw_option) {
+      *arguments = realloc(*arguments, sizeof(char*) * ++count);
+      (*arguments)[count - 1] = arg;
+      saw_value = 0;
+    }
+  }
+
+  return count;
+}

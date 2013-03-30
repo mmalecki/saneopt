@@ -32,6 +32,8 @@ char* saneopt_get(saneopt_t* opt, char* option);
 /*
  * Get command line arguments, that is: any arguments not being an argument
  * value and all arguments after "--".
+ * Return value is number of arguments, actual arguments are put into
+ * `arguments`.
  *
  * For example, parsing:
  *
@@ -39,6 +41,6 @@ char* saneopt_get(saneopt_t* opt, char* option);
  *
  * Will result in this function returning ["foo", "bar", "--not-option", "baz"].
  */
-char** saneopt_arguments(saneopt_t* opt);
+int saneopt_arguments(saneopt_t* opt, char*** arguments);
 
 #endif
