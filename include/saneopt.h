@@ -20,13 +20,13 @@ struct saneopt {
 saneopt_t* saneopt_init(int argc, char** argv);
 
 /*
- * Set an alias from `old` to `new`.
+ * Set an alias from `option` to `alias`.
  */
-void saneopt_alias(saneopt_t* opt, char* old, char* new_);
+void saneopt_alias(saneopt_t* opt, char* option, char* alias);
 
 /*
  * Get option called `option`.
  */
-char* saneopt_get(saneopt_t* opt, char* name);
+char* saneopt_get(saneopt_t* opt, char* option);
 
 #endif

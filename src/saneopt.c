@@ -13,18 +13,18 @@ saneopt_t* saneopt_init(int argc, char** argv) {
   return saneopt;
 }
 
-int saneopt__matches(saneopt_t* opt, char* name, char* arg) {
+int saneopt__matches(saneopt_t* opt, char* option, char* arg) {
   int i;
 
   if (strncmp(arg, "--", 2) == 0) {
     arg += 2;
 
-    if (strcmp(arg, name) == 0) {
+    if (strcmp(arg, option) == 0) {
       return 1;
     }
 
     for (i = 0; opt->aliases && i < opt->alias_count; i++) {
-      if (strcmp(opt->aliases[i]->option, name) == 0 &&
+      if (strcmp(opt->aliases[i]->option, option) == 0 &&
           strlen(opt->aliases[i]->alias) > 1 &&
           strcmp(arg, opt->aliases[i]->alias) == 0) {
         return 1;
@@ -34,12 +34,12 @@ int saneopt__matches(saneopt_t* opt, char* name, char* arg) {
   else if (strncmp(arg, "-", 1) == 0) {
     ++arg;
 
-    if (strcmp(arg, name) == 0) {
+    if (strcmp(arg, option) == 0) {
       return 1;
     }
 
     for (i = 0; opt->aliases && i < opt->alias_count; i++) {
-      if (strcmp(opt->aliases[i]->option, name) == 0 &&
+      if (strcmp(opt->aliases[i]->option, option) == 0 &&
           strlen(opt->aliases[i]->alias) == 1 &&
           strcmp(arg, opt->aliases[i]->alias) == 0) {
         return 1;
@@ -62,13 +62,13 @@ void saneopt_alias(saneopt_t* opt, char* option, char* alias) {
   opt->aliases[opt->alias_count - 1] = alias_;
 }
 
-char* saneopt_get(saneopt_t* opt, char* name) {
+char* saneopt_get(saneopt_t* opt, char* option) {
   int i;
   char* arg;
 
   for (i = 0; i < opt->argc; i++) {
     arg = opt->argv[i];
-    if (saneopt__matches(opt, name, arg)) {
+    if (saneopt__matches(opt, option, arg)) {
       return ((i + 1) < opt->argc && opt->argv[i + 1][0] != '-')
         ? opt->argv[i + 1]
         : "";
