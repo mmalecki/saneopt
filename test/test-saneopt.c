@@ -33,17 +33,20 @@ void test_no_value() {
 void test_value() {
   printf("test_value()\n");
 
-  char** argv = malloc(4 * sizeof(char*));
+  char** argv = malloc(6 * sizeof(char*));
 
   argv[0] = "--option";
   argv[1] = "value";
   argv[2] = "--next-option";
   argv[3] = "--third-option";
+  argv[4] = "-k";
+  argv[5] = "short-value";
 
-  saneopt_t* opt = saneopt_init(4, argv);
+  saneopt_t* opt = saneopt_init(6, argv);
   assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
   assert(strcmp(saneopt_get(opt, "next-option"), "") == 0);
   assert(strcmp(saneopt_get(opt, "third-option"), "") == 0);
+  assert(strcmp(saneopt_get(opt, "k"), "short-value") == 0);
 
   free(argv);
   free(opt);
@@ -66,11 +69,28 @@ void test_long_alias() {
   free(opt);
 }
 
+void test_short_alias() {
+  printf("test_short_alias()\n");
+
+  char** argv = malloc(2 * sizeof(char*));
+
+  argv[0] = "-o";
+  argv[1] = "value";
+
+  saneopt_t* opt = saneopt_init(2, argv);
+  saneopt_alias(opt, "option", "o");
+  assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
+
+  free(argv);
+  free(opt);
+}
+
 int main(int argc, char** argv) {
   test_no_arg();
   test_no_value();
   test_value();
   test_long_alias();
+  test_short_alias();
 
   return 0;
 }
