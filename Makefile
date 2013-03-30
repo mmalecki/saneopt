@@ -1,6 +1,6 @@
 OBJS += src/saneopt.o
 
-TEST_OBJS += test/test-saneopt
+TESTS += test/test-saneopt
 
 CFLAGS=-g -Wall -Iinclude
 
@@ -12,12 +12,15 @@ libsaneopt.a: $(OBJS)
 src/%.o: src/%.c
 	gcc $(CFLAGS) -c $< -o $@
 
-test/%: test/%.c
+test/%: test/%.c libsaneopt.a
 	gcc -L. -lsaneopt $(CFLAGS) $< -o $@
 
-test: libsaneopt.a $(OBJS) $(TEST_OBJS)
+test: libsaneopt.a $(TESTS)
 	test/test-saneopt
 
 clean:
 	rm -f libsaneopt.a
 	rm -f $(OBJS)
+	rm -f $(TESTS)
+
+.PHONY: all test clean
