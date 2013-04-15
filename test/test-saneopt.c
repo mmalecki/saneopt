@@ -129,6 +129,45 @@ void test_arguments() {
   free(opt);
 }
 
+void test_arguments_first() {
+  printf("test_arguments_first()\n");
+
+  char** argv = malloc(2 * sizeof(char*));
+  char** args;
+
+  argv[0] = "value";
+  argv[1] = "next-value";
+
+  saneopt_t* opt = saneopt_init(2, argv);
+  args = saneopt_arguments(opt);
+  assert(strcmp(args[0], "value") == 0);
+  assert(strcmp(args[1], "next-value") == 0);
+  assert(args[2] == NULL);
+
+  free(argv);
+  free(opt);
+}
+
+void test_arguments_first_marker() {
+  printf("test_arguments_first_marker()\n");
+
+  char** argv = malloc(2 * sizeof(char*));
+  char** args;
+
+  argv[0] = "--";
+  argv[1] = "value";
+  argv[2] = "next-value";
+
+  saneopt_t* opt = saneopt_init(3, argv);
+  args = saneopt_arguments(opt);
+  assert(strcmp(args[0], "value") == 0);
+  assert(strcmp(args[1], "next-value") == 0);
+  assert(args[2] == NULL);
+
+  free(argv);
+  free(opt);
+}
+
 void test_all() {
   printf("test_all()\n");
 
@@ -159,6 +198,8 @@ int main(int argc, char** argv) {
   test_short_alias();
   test_stop_after_arguments();
   test_arguments();
+  test_arguments_first();
+  test_arguments_first_marker();
   test_all();
 
   return 0;
