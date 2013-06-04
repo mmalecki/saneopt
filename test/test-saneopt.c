@@ -171,19 +171,23 @@ void test_arguments_first_marker() {
 void test_all() {
   printf("test_all()\n");
 
-  char** argv = malloc(4 * sizeof(char*));
+  char** argv = malloc(6 * sizeof(char*));
   char** args;
 
   argv[0] = "--option";
   argv[1] = "first";
   argv[2] = "--option";
   argv[3] = "second";
+  argv[4] = "-o";
+  argv[5] = "third";
 
-  saneopt_t* opt = saneopt_init(4, argv);
+  saneopt_t* opt = saneopt_init(6, argv);
+  assert(saneopt_alias(opt, "option", "o") == 0);
   args = saneopt_get_all(opt, "option");
   assert(strcmp(args[0], "first") == 0);
   assert(strcmp(args[1], "second") == 0);
-  assert(args[2] == NULL);
+  assert(strcmp(args[2], "third") == 0);
+  assert(args[3] == NULL);
 
   free(argv);
   free(opt);
