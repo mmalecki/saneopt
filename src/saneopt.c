@@ -107,8 +107,10 @@ char** saneopt_get_all(saneopt_t* opt, char* option) {
     if (saneopt__matches(opt, option, arg)) {
       result = realloc(result, sizeof(char*) * (++count + 1));
 
-      if (result == NULL)
+      if (result == NULL) {
+        free(result);
         return NULL;
+      }
 
       result[count - 1] = ((i + 1) < opt->argc && opt->argv[i + 1][0] != '-')
         ? opt->argv[i + 1]
