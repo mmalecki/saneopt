@@ -92,7 +92,8 @@ char* saneopt_get(saneopt_t* opt, char* option) {
 }
 
 char** saneopt_get_all(saneopt_t* opt, char* option) {
-  int i, count;
+  int i;
+  int count = 0;
   char* arg;
   char** result = malloc(sizeof(char*));
   result[0] = NULL;
