@@ -123,7 +123,7 @@ char** saneopt_get_all(saneopt_t* opt, char* option) {
 }
 
 char** saneopt_arguments(saneopt_t* opt) {
-  int i, count = 0, saw_marker = 0, saw_option = 0, saw_value = 0;;
+  int i, j, count = 0, saw_marker = 0, saw_option = 0, saw_value = 0;;
   char* arg;
   char** result = NULL;
 
@@ -131,19 +131,31 @@ char** saneopt_arguments(saneopt_t* opt) {
     arg = opt->argv[i];
 
     if (strcmp(arg, "--") == 0) {
-      saw_marker = 1;
-      continue;
+      //
+      // When we find the marker, copy rest of the command line to the result
+      // and return.
+      //
+      result = realloc(result, sizeof(char*) * (count + opt->argc - i));
+      if (result == NULL)
+        return NULL;
+
+      for (j = i + 1; j < opt->argc; j++)
+        result[count + j - i - 1] = opt->argv[j];
+
+      result[count + opt->argc - i] = NULL;
+      return result;
     }
-    else if (strncmp(arg, "-", 1) == 0) {
+
+    if (strncmp(arg, "-", 1) == 0) {
       saw_option = 1;
-      continue;
     }
     else if (saw_option) {
       saw_option = 0;
       saw_value = 1;
       continue;
     }
-    else if (saw_value || saw_marker || !saw_option) {
+
+    if (saw_value || saw_marker || !saw_option) {
       result = realloc(result, sizeof(char*) * (++count + 1));
 
       if (result == NULL)

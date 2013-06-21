@@ -168,6 +168,36 @@ void test_arguments_first_marker() {
   free(opt);
 }
 
+void test_arguments_many_markers() {
+  printf("test_arguments_many_markers()\n");
+
+  char** argv = malloc(9 * sizeof(char*));
+  char** args;
+
+  argv[0] = "-o";
+  argv[1] = "stdout.log";
+  argv[2] = "--";
+  argv[3] = "estragon";
+  argv[4] = "-h";
+  argv[5] = "127.0.0.1:1337";
+  argv[6] = "--";
+  argv[7] = "node";
+  argv[8] = "script.js";
+
+  saneopt_t* opt = saneopt_init(9, argv);
+  args = saneopt_arguments(opt);
+  assert(strcmp(args[0], "estragon") == 0);
+  assert(strcmp(args[1], "-h") == 0);
+  assert(strcmp(args[2], "127.0.0.1:1337") == 0);
+  assert(strcmp(args[3], "--") == 0);
+  assert(strcmp(args[4], "node") == 0);
+  assert(strcmp(args[5], "script.js") == 0);
+  assert(args[6] == NULL);
+
+  free(argv);
+  free(opt);
+}
+
 void test_all() {
   printf("test_all()\n");
 
@@ -204,6 +234,7 @@ int main(int argc, char** argv) {
   test_arguments();
   test_arguments_first();
   test_arguments_first_marker();
+  test_arguments_many_markers();
   test_all();
 
   return 0;
