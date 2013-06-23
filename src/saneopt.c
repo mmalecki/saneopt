@@ -123,7 +123,7 @@ char** saneopt_get_all(saneopt_t* opt, char* option) {
 }
 
 char** saneopt_arguments(saneopt_t* opt) {
-  int i, j, count = 0, saw_marker = 0, saw_option = 0, saw_value = 0;;
+  int i, j, count = 0, saw_option = 0, saw_value = 0;
   char* arg;
   char** result = NULL;
 
@@ -155,7 +155,7 @@ char** saneopt_arguments(saneopt_t* opt) {
       continue;
     }
 
-    if (saw_value || saw_marker || !saw_option) {
+    if (saw_value || !saw_option) {
       result = realloc(result, sizeof(char*) * (++count + 1));
 
       if (result == NULL)
