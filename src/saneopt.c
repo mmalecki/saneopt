@@ -142,7 +142,7 @@ char** saneopt_arguments(saneopt_t* opt) {
       for (j = i + 1; j < opt->argc; j++)
         result[count + j - i - 1] = opt->argv[j];
 
-      result[count + opt->argc - i] = NULL;
+      result[count + opt->argc - i - 1] = NULL;
       return result;
     }
 
