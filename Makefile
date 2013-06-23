@@ -16,7 +16,7 @@ test/%: test/%.c libsaneopt.a
 	gcc -L. -lsaneopt $(CFLAGS) $< -o $@
 
 test: libsaneopt.a $(TESTS)
-	test/test-saneopt
+	MallocScribble=1 test/test-saneopt
 
 clean:
 	rm -f libsaneopt.a
