@@ -148,6 +148,7 @@ char** saneopt_arguments(saneopt_t* opt) {
 
     if (strncmp(arg, "-", 1) == 0) {
       saw_option = 1;
+      continue;
     }
     else if (saw_option) {
       saw_option = 0;

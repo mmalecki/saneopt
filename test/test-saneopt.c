@@ -198,6 +198,31 @@ void test_arguments_many_markers() {
   free(opt);
 }
 
+// https://github.com/mmalecki/saneopt/issues/2
+void test_arguments_issue_2() {
+  printf("test_arguments_issue_2()\n");
+
+  char** argv = malloc(7 * sizeof(char*));
+  char** args;
+
+  argv[0] = "-h";
+  argv[1] = "127.0.0.1:1337";
+  argv[2] = "-h";
+  argv[3] = "127.0.0.1:1338";
+  argv[4] = "--";
+  argv[5] = "node";
+  argv[6] = "test/fixtures/listen.js";
+
+  saneopt_t* opt = saneopt_init(7, argv);
+  args = saneopt_arguments(opt);
+  assert(strcmp(args[0], "node") == 0);
+  assert(strcmp(args[1], "test/fixtures/listen.js") == 0);
+  assert(args[2] == NULL);
+
+  free(argv);
+  free(opt);
+}
+
 void test_all() {
   printf("test_all()\n");
 
@@ -235,6 +260,7 @@ int main(int argc, char** argv) {
   test_arguments_first();
   test_arguments_first_marker();
   test_arguments_many_markers();
+  test_arguments_issue_2();
   test_all();
 
   return 0;
