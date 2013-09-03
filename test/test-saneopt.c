@@ -223,6 +223,33 @@ void test_arguments_issue_2() {
   free(opt);
 }
 
+// https://github.com/mmalecki/saneopt/issues/3
+void test_arguments_issue_3() {
+  printf("test_arguments_issue_3()\n");
+
+  char** argv = malloc(8 * sizeof(char*));
+  char** args;
+
+  argv[0] = "-o";
+  argv[1] = "out.log";
+  argv[2] = "--min-uptime";
+  argv[3] = "2000";
+  argv[4] = "run";
+  argv[5] = "--";
+  argv[6] = "node";
+  argv[7] = "s.js";
+
+  saneopt_t* opt = saneopt_init(8, argv);
+  args = saneopt_arguments(opt);
+  assert(strcmp(args[0], "run") == 0);
+  assert(strcmp(args[1], "node") == 0);
+  assert(strcmp(args[2], "s.js") == 0);
+  assert(args[3] == NULL);
+
+  free(argv);
+  free(opt);
+}
+
 void test_all() {
   printf("test_all()\n");
 
@@ -261,6 +288,7 @@ int main(int argc, char** argv) {
   test_arguments_first_marker();
   test_arguments_many_markers();
   test_arguments_issue_2();
+  test_arguments_issue_3();
   test_all();
 
   return 0;
