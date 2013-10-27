@@ -1,172 +1,344 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <saneopt.h>
 
-#include "../include/saneopt.h"
+char* saneopt__pad_right(char* text, char* pad, int length) {
+  int i;
+  char* out = malloc((strlen(text) + length) * sizeof(char));
 
-saneopt_t* saneopt_init(int argc, char** argv) {
+  strcpy(out, text);
+
+  for (i = strlen(text); i < length; i++) {
+    strcat(out, pad);
+  }
+
+  return out;
+}
+
+saneopt_option_t* saneopt_alias(saneopt_option_t* option, char* alias) {
+  int i;
+
+  // Immediately return if this alias is already defined for this option.
+  for (i = 0; i < option->aliases_length; i++) {
+    if (strcmp(option->aliases[i], alias) == 0) {
+      return option;
+    }
+  }
+
+  if (option->aliases == NULL) {
+    option->aliases = malloc(sizeof(char*));
+  }
+  else {
+    option->aliases = realloc(option->aliases,
+        (option->aliases_length + 1) * sizeof(char*));
+  }
+
+  option->aliases[option->aliases_length++] = alias;
+
+  return option;
+}
+
+saneopt_t* saneopt_init() {
   saneopt_t* saneopt = malloc(sizeof(saneopt_t));
-  saneopt->argc = argc;
-  saneopt->argv = argv;
 
-  saneopt->aliases = NULL;
-  saneopt->alias_count = 0;
+  saneopt->argv = NULL;
+  saneopt->argc = 0;
+
+  saneopt->options = NULL;
+  saneopt->options_length = 0;
+
+  saneopt->arguments = NULL;
+  saneopt->arguments_length = 0;
+
+  saneopt_option_t* help = saneopt_option(saneopt, "help");
+  help->desc = "This help screen.";
+  help->requires_value = 0;
+
   return saneopt;
 }
 
-int saneopt__matches(saneopt_t* opt, char* option, char* arg) {
-  int i;
+saneopt_option_t* saneopt_get(saneopt_t* saneopt, char* input, int _long) {
+  int i, k;
+  saneopt_option_t* option;
 
-  if (strncmp(arg, "--", 2) == 0) {
-    arg += 2;
+  for (i = 0; i < saneopt->options_length; i++) {
+    option = saneopt->options[i];
 
-    if (strcmp(arg, option) == 0) {
-      return 1;
+    if (_long && strcmp(option->name, input) == 0) {
+      return option;
     }
-
-    for (i = 0; opt->aliases && i < opt->alias_count; i++) {
-      if (strcmp(opt->aliases[i]->option, option) == 0 &&
-          strlen(opt->aliases[i]->alias) > 1 &&
-          strcmp(arg, opt->aliases[i]->alias) == 0) {
-        return 1;
+    else if (!_long) {
+      for (k = 0; k < option->aliases_length; k++) {
+        if (strcmp(option->aliases[k], input) == 0) {
+          return option;
+        }
       }
-    }
-  }
-  else if (strncmp(arg, "-", 1) == 0) {
-    ++arg;
-
-    if (strcmp(arg, option) == 0) {
-      return 1;
-    }
-
-    for (i = 0; opt->aliases && i < opt->alias_count; i++) {
-      if (strcmp(opt->aliases[i]->option, option) == 0 &&
-          strlen(opt->aliases[i]->alias) == 1 &&
-          strcmp(arg, opt->aliases[i]->alias) == 0) {
-        return 1;
-      }
-    }
-  }
-
-  return 0;
-}
-
-int saneopt_alias(saneopt_t* opt, char* option, char* alias) {
-  saneopt__alias_t** aliases;
-  saneopt__alias_t* alias_ = malloc(sizeof(saneopt__alias_t));
-
-  alias_->option = option;
-  alias_->alias = alias;
-
-  aliases = realloc(
-    opt->aliases,
-    ++opt->alias_count * sizeof(saneopt__alias_t*)
-  );
-
-  if (aliases == NULL)
-    return -1;
-
-  opt->aliases = aliases;
-  opt->aliases[opt->alias_count - 1] = alias_;
-
-  return 0;
-}
-
-char* saneopt_get(saneopt_t* opt, char* option) {
-  int i;
-  char* arg;
-
-  for (i = 0; i < opt->argc; i++) {
-    arg = opt->argv[i];
-
-    if (strcmp(arg, "--") == 0)
-      return NULL;
-
-    if (saneopt__matches(opt, option, arg)) {
-      return ((i + 1) < opt->argc && opt->argv[i + 1][0] != '-')
-        ? opt->argv[i + 1]
-        : "";
     }
   }
 
   return NULL;
 }
 
-char** saneopt_get_all(saneopt_t* opt, char* option) {
-  int i;
-  int count = 0;
-  char* arg;
-  char** result = malloc(sizeof(char*));
-  result[0] = NULL;
+void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
+  int i, j;
+  char* aliases = NULL;
+  char* label = NULL;
+  char* name = NULL;
 
-  for (i = 0; i < opt->argc; i++) {
-    arg = opt->argv[i];
-
-    if (strcmp(arg, "--") == 0)
-      return result;
-
-    if (saneopt__matches(opt, option, arg)) {
-      result = realloc(result, sizeof(char*) * (++count + 1));
-
-      if (result == NULL) {
-        free(result);
-        return NULL;
+  if (option != NULL) {
+    for (i = 0; i < option->aliases_length; i++) {
+      if (aliases == NULL) {
+        aliases = malloc((strlen(option->aliases[i])) * sizeof(char));
+        sprintf(aliases, "-%s", option->aliases[i]);
       }
+      else {
+        aliases = realloc(aliases,
+          (strlen(aliases) + strlen(option->aliases[i]) + 2) * sizeof(char));
+        aliases = strcat(aliases, ", ");
+        aliases = strcat(aliases, option->aliases[i]);
+      }
+    }
 
-      result[count - 1] = ((i + 1) < opt->argc && opt->argv[i + 1][0] != '-')
-        ? opt->argv[i + 1]
-        : "";
-      result[count] = NULL;
+    if (option->help || option->desc) {
+      if (option->help) {
+        printf("--%s\nAliases: %s\n\n%s\n", option->name, aliases, option->help);
+      }
+      else if (option->desc) {
+        printf("--%s\nAliases: %s\n\n%s\n", option->name, aliases, option->desc);
+      }
+    }
+    else {
+      printf("No help for %s\n", option->name);
+    }
+
+    // Clean up malloc'd aliases
+    if (aliases != NULL) {
+      free(aliases);
+      aliases = NULL;
+    }
+
+    return;
+  }
+
+  if (saneopt->header != NULL) {
+    printf("%s\n\n", saneopt->header);
+  }
+
+  for (i = 0; i < saneopt->options_length; i++) {
+    option = saneopt->options[i];
+
+    if (option->desc && !option->requires_value) {
+      label = saneopt__pad_right(option->name, " ", 30);
+      printf("--%s%s\n", label, option->desc);
+      free(label);
+      label = NULL;
+
+      for (j = 0; j < option->aliases_length; j++) {
+        label = saneopt__pad_right(option->aliases[j], " ", 30);
+        printf("--%s%s\n", label, option->desc);
+        free(label);
+        label = NULL;
+      }
+    }
+    else if (option->desc && option->requires_value) {
+      name = malloc((strlen(option->name) + 9) * sizeof(char));
+      sprintf(name, "%s [value]", option->name);
+
+      label = saneopt__pad_right(name, " ", 30);
+      printf("--%s%s\n", label, option->desc);
+      free(name);
+      free(label);
+      label = name = NULL;
+
+      for (j = 0; j < option->aliases_length; j++) {
+        name = malloc((strlen(option->aliases[j]) + 9) * sizeof(char));
+        sprintf(name, "%s [value]", option->aliases[j]);
+
+        label = saneopt__pad_right(name, " ", 30);
+        printf("--%s%s\n", label, option->desc);
+        free(name);
+        free(label);
+        label = name = NULL;
+      }
+    }
+    else {
+      name = malloc((strlen(option->name) + 9) * sizeof(char));
+      sprintf(name, "%s [value]", option->name);
+
+      label = saneopt__pad_right(name, " ", 30);
+      printf("--%sNo help available\n", label);
+      free(name);
+      free(label);
+      label = name = NULL;
+
+      for (j = 0; j < option->aliases_length; j++) {
+        name = malloc((strlen(option->aliases[j]) + 9) * sizeof(char));
+        sprintf(name, "%s [value]", option->aliases[j]);
+
+        label = saneopt__pad_right(name, " ", 30);
+        printf("--%sNo help available\n", label);
+        free(name);
+        free(label);
+        label = name = NULL;
+      }
     }
   }
 
-  return result;
+  // Make sure all malloc'd objects are free
+  if (aliases != NULL) free(aliases);
+  if (label != NULL) free(label);
+  if (name != NULL) free(name);
 }
 
-char** saneopt_arguments(saneopt_t* opt) {
-  int i, j, count = 0, saw_option = 0, saw_value = 0;
-  char* arg;
-  char** result = NULL;
+void saneopt_help_for(saneopt_t* saneopt, char* name) {
+  int i, j;
+  saneopt_option_t* option;
 
-  for (i = 0; i < opt->argc; i++) {
-    arg = opt->argv[i];
+  for (i = 0; i < saneopt->options_length; i++) {
+    option = saneopt->options[i];
 
-    if (strcmp(arg, "--") == 0) {
-      //
-      // When we find the marker, copy rest of the command line to the result
-      // and return.
-      //
-      result = realloc(result, sizeof(char*) * (count + opt->argc - i));
-      if (result == NULL)
-        return NULL;
-
-      for (j = i + 1; j < opt->argc; j++)
-        result[count + j - i - 1] = opt->argv[j];
-
-      result[count + opt->argc - i - 1] = NULL;
-      return result;
+    if (strcmp(option->name, name) == 0) {
+      saneopt_help(saneopt, option);
+      return;
     }
 
-    if (strncmp(arg, "-", 1) == 0) {
-      saw_option = 1;
-      continue;
+    for (j = 0; j < option->aliases_length; j++) {
+      if (strcmp(option->aliases[j], name) == 0) {
+        saneopt_help(saneopt, option);
+        return;
+      }
     }
-    else if (saw_option) {
-      saw_option = 0;
-      saw_value = 1;
-      continue;
-    }
+  }
+}
 
-    if (saw_value || !saw_option) {
-      result = realloc(result, sizeof(char*) * (++count + 1));
+void saneopt_free(saneopt_t* saneopt) {
+  int i;
+  saneopt_option_t* option;
 
-      if (result == NULL)
-        return NULL;
+  for (i = 0; i < saneopt->options_length; i++) {
+    option = saneopt->options[i];
+    if (option->aliases != NULL) free(option->aliases);
+    free(option);
+  }
 
-      result[count - 1] = arg;
-      result[count] = NULL;
-      saw_value = 0;
+  if (saneopt->options != NULL) free(saneopt->options);
+  if (saneopt->arguments != NULL) free(saneopt->arguments);
+
+  free(saneopt);
+}
+
+saneopt_option_t* saneopt_option(saneopt_t* saneopt, char* name) {
+  int i;
+
+  for (i = 0; i < saneopt->options_length; i++) {
+    if (saneopt->options[i]->name == name) {
+      return saneopt->options[i];
     }
   }
 
-  return result;
+  if (saneopt->options == NULL) {
+    saneopt->options = malloc(sizeof(saneopt_option_t));
+  }
+  else {
+    saneopt->options = realloc(saneopt->options,
+        (saneopt->options_length + 1) * sizeof(saneopt_option_t));
+  }
+
+  saneopt_option_t* option = malloc(sizeof(saneopt_option_t));
+  option->name = name;
+  option->required = 0;
+  option->available = 0;
+  option->requires_value = 1;
+  option->desc = NULL;
+  option->help = NULL;
+  option->value = NULL;
+  option->aliases = NULL;
+  option->aliases_length = 0;
+
+  saneopt->options[saneopt->options_length] = option;
+
+  return saneopt->options[saneopt->options_length++];
+}
+
+saneopt_t* saneopt_parse(saneopt_t* saneopt, int argc, char** argv) {
+  int i, j;
+  char* argument;
+  saneopt_option_t* option;
+
+  if (saneopt == NULL) {
+    saneopt = saneopt_init();
+  }
+
+  if (argc == 1) {
+    saneopt_help(saneopt, NULL);
+    return saneopt;
+  }
+
+  saneopt->argv = argv;
+  saneopt->argc = argc;
+
+  for (i = 1; i < argc; i++) {
+    argument = argv[i];
+
+    if (strcmp(argument, "--") == 0) {
+      for (j = (i + 1); j < argc; j++) {
+        saneopt_push_argument(saneopt, argument);
+      }
+      break;
+    }
+
+    if (strncmp(argument, "--", 2) == 0) {
+      argument += 2;
+
+      if (strcmp(argument, "help") == 0) {
+        if (i + 1 < argc && strncmp(argv[i + 1], "-", 1) != 0) {
+          saneopt_help_for(saneopt, argv[i + 1]);
+        }
+        else {
+          saneopt_help(saneopt, NULL);
+        }
+        return saneopt;
+      }
+
+      option = saneopt_get(saneopt, argument, 1);
+      if (option != NULL) {
+        option->available = 1;
+        if (option->requires_value && i + 1 < argc &&
+            strncmp(argv[i + 1], "-", 1) != 0) {
+          option->value = argv[++i];
+        }
+      }
+    }
+    else if (strncmp(argument, "-", 1) == 0) {
+      argument++;
+      option = saneopt_get(saneopt, argument, 0);
+      if (option != NULL) {
+        option->available = 1;
+        if (option->requires_value && i + 1 < argc &&
+            strncmp(argv[i + 1], "-", 1) != 0) {
+          option->value = argv[++i];
+        }
+      }
+    }
+    else {
+      saneopt_push_argument(saneopt, argument);
+    }
+  }
+
+  return saneopt;
+}
+
+saneopt_t* saneopt_push_argument(saneopt_t* saneopt, char* argument) {
+  if (saneopt->arguments == NULL) {
+    saneopt->arguments = malloc(sizeof(char*));
+  }
+  else {
+    saneopt->arguments = realloc(saneopt->arguments,
+        (saneopt->arguments_length + 1) * sizeof(char*));
+  }
+
+  saneopt->arguments[saneopt->arguments_length++] = argument;
+
+  return saneopt;
 }

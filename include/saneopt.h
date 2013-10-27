@@ -1,61 +1,72 @@
-#ifndef _SANEOPT_H
-#define _SANEOPT_H
+#ifndef __SANEOPT_H
+#define __SANEOPT_H
 
-struct saneopt__alias {
-  char* option;
-  char* alias;
-} typedef saneopt__alias_t;
+typedef struct saneopt_option_s {
+  char* name;
+  int required;
+  int available;
+  int requires_value;
+  char* desc;
+  char* help;
+  char* value;
 
-struct saneopt {
+  char** aliases;
+  int aliases_length;
+} saneopt_option_t;
+
+typedef struct saneopt_s {
   int argc;
   char** argv;
 
-  saneopt__alias_t** aliases;
-  unsigned int alias_count;
-} typedef saneopt_t;
+  char* header;
+
+  saneopt_option_t** options;
+  int options_length;
+
+  char** arguments;
+  int arguments_length;
+} saneopt_t;
 
 /*
- * Create a new `saneopt` parser.
+ *  Create an short option alias for a long option
  */
-saneopt_t* saneopt_init(int argc, char** argv);
+saneopt_option_t* saneopt_alias(saneopt_option_t* option, char* alias);
 
 /*
- * Set an alias from `option` to `alias`.
- * Return -1 on error, 0 on success.
+ *  Search for the short or long option in the current list of options
  */
-int saneopt_alias(saneopt_t* opt, char* option, char* alias);
+saneopt_option_t* saneopt_get(saneopt_t* saneopt, char* input, int _long);
 
 /*
- * Get option called `option`.
+ *  Output the help for option
+ *  If option is NULL, it will print the descriptions for all options
  */
-char* saneopt_get(saneopt_t* opt, char* option);
+void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option);
 
 /*
- * Get all values for option called `option`.
- * Return value is a NULL-terminated array.
- *
- * For example, getting all values for "option", with the following args:
- *
- *   ./app --option first --option second
- *
- * Will return ["first", "second"].
- *
- * If a occurrence is lacking a value (e.g. `--option --next-option`), it'll be
- * set to "".
+ *  Initialize and return saneopt for assigning options, aliases, etc.
  */
-char** saneopt_get_all(saneopt_t* opt, char* option);
+saneopt_t* saneopt_init();
 
 /*
- * Get command line arguments, that is: any arguments not being an argument
- * value and all arguments after "--".
- * Return value is a NULL-terminated array.
- *
- * For example, parsing:
- *
- *   ./app --option value foo bar -- --not-option baz
- *
- * Will result in this function returning ["foo", "bar", "--not-option", "baz"].
+ *  Free any malloc'd objects
  */
-char** saneopt_arguments(saneopt_t* opt);
+void saneopt_free(saneopt_t* saneopt);
 
-#endif
+/*
+ *  Add option. If option already exists, the option will be returned.
+ */
+saneopt_option_t* saneopt_option(saneopt_t* saneopt, char* option);
+
+/*
+ *  Parse the inputs from main()
+ *  If saneopt is NULL, a new saneopt will be created with saneopt_init()
+ */
+saneopt_t* saneopt_parse(saneopt_t* saneopt, int argc, char** argv);
+
+/*
+ *  Allows an argument to be manually pushed into the arguments list
+ */
+saneopt_t* saneopt_push_argument(saneopt_t* saneopt, char* argument);
+
+#endif //__SANEOPT_H

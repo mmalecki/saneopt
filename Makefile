@@ -1,10 +1,31 @@
-OBJS += src/saneopt.o
+include config.mk
 
-TESTS += test/test-saneopt
+BINARY?=saneopt
 
-CFLAGS=-g -Wall -Iinclude
+SRC+=src/saneopt.c
 
-all: libsaneopt.a
+OBJS+=src/saneopt.o
+
+CFLAGS+=-g -Wall -Iinclude
+
+ifdef VERSION
+	CFLAGS+=-DSANEOPT_VERSION="\"$(VERSION)\""
+endif
+
+all: binary library
+
+clean:
+	rm -rf src/*.o
+
+cleanall: clean
+	rm -rf $(BINARY)
+	rm -rf *.a
+	rm -rf *.dSYM
+
+binary: $(SRC)
+	gcc $(CFLAGS) $< src/main.c -o $(BINARY)
+
+library: libsaneopt.a clean
 
 libsaneopt.a: $(OBJS)
 	ar rcs $@ $^
@@ -12,15 +33,4 @@ libsaneopt.a: $(OBJS)
 src/%.o: src/%.c
 	gcc $(CFLAGS) -c $< -o $@
 
-test/%: test/%.c libsaneopt.a
-	gcc -L. -lsaneopt $(CFLAGS) $< -o $@
-
-test: libsaneopt.a $(TESTS)
-	MallocScribble=1 test/test-saneopt
-
-clean:
-	rm -f libsaneopt.a
-	rm -f $(OBJS)
-	rm -f $(TESTS)
-
-.PHONY: all test clean
+.PHONY: all clean cleanall binary library
