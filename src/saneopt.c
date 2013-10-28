@@ -3,17 +3,15 @@
 #include <string.h>
 #include <saneopt.h>
 
-char* saneopt__pad_right(char* text, char* pad, int length) {
+char* saneopt__pad_right(char* ptr, char* pad, int length) {
   int i;
-  char* out = malloc((strlen(text) + length) * sizeof(char));
+  ptr = realloc(ptr, ((strlen(ptr) + length) - strlen(ptr)) * sizeof(char));
 
-  strcpy(out, text);
-
-  for (i = strlen(text); i < length; i++) {
-    strcat(out, pad);
+  for (i = strlen(ptr); i < length; i++) {
+    strcat(ptr, pad);
   }
 
-  return out;
+  return ptr;
 }
 
 saneopt_option_t* saneopt_alias(saneopt_option_t* option, char* alias) {
@@ -84,7 +82,6 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
   int i, j;
   char* aliases = NULL;
   char* label = NULL;
-  char* name = NULL;
 
   if (option != NULL) {
     for (i = 0; i < option->aliases_length; i++) {
@@ -136,67 +133,36 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
   for (i = 0; i < saneopt->options_length; i++) {
     option = saneopt->options[i];
 
-    if (option->desc && !option->requires_value) {
-      label = saneopt__pad_right(option->name, " ", 30);
-      printf("--%s%s\n", label, option->desc);
-      free(label);
-      label = NULL;
+    label = malloc(strlen(option->name) * sizeof(char));
+    sprintf(label, "%s", option->name);
 
-      for (j = 0; j < option->aliases_length; j++) {
-        label = saneopt__pad_right(option->aliases[j], " ", 30);
-        printf("--%s%s\n", label, option->desc);
-        free(label);
-        label = NULL;
-      }
+    for (j = 0; j < option->aliases_length; j++) {
+      label = realloc(label, (strlen(label) + strlen(option->aliases[j]) + 3) * sizeof(char));
+      label = strcat(label, ", -");
+      label = strcat(label, option->aliases[j]);
     }
-    else if (option->desc && option->requires_value) {
-      name = malloc((strlen(option->name) + 9) * sizeof(char));
-      sprintf(name, "%s [value]", option->name);
 
-      label = saneopt__pad_right(name, " ", 30);
+    if (option->requires_value) {
+      label = realloc(label, (strlen(label) + 9) * sizeof(char));
+      label = strcat(label, " [value]");
+    }
+
+    label = saneopt__pad_right(label, " ", 30);
+
+    if (option->desc) {
       printf("--%s%s\n", label, option->desc);
-      free(name);
-      free(label);
-      label = name = NULL;
-
-      for (j = 0; j < option->aliases_length; j++) {
-        name = malloc((strlen(option->aliases[j]) + 9) * sizeof(char));
-        sprintf(name, "%s [value]", option->aliases[j]);
-
-        label = saneopt__pad_right(name, " ", 30);
-        printf("--%s%s\n", label, option->desc);
-        free(name);
-        free(label);
-        label = name = NULL;
-      }
     }
     else {
-      name = malloc((strlen(option->name) + 9) * sizeof(char));
-      sprintf(name, "%s [value]", option->name);
-
-      label = saneopt__pad_right(name, " ", 30);
       printf("--%sNo help available\n", label);
-      free(name);
-      free(label);
-      label = name = NULL;
-
-      for (j = 0; j < option->aliases_length; j++) {
-        name = malloc((strlen(option->aliases[j]) + 9) * sizeof(char));
-        sprintf(name, "%s [value]", option->aliases[j]);
-
-        label = saneopt__pad_right(name, " ", 30);
-        printf("--%sNo help available\n", label);
-        free(name);
-        free(label);
-        label = name = NULL;
-      }
     }
+
+    free(label);
+    label = NULL;
   }
 
   // Make sure all malloc'd objects are free
   if (aliases != NULL) free(aliases);
   if (label != NULL) free(label);
-  if (name != NULL) free(name);
 }
 
 void saneopt_help_for(saneopt_t* saneopt, char* name) {
