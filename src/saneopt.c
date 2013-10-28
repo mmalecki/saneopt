@@ -92,8 +92,7 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
       else {
         aliases = realloc(aliases,
           (strlen(aliases) + strlen(option->aliases[i]) + 3) * sizeof(char));
-        aliases = strcat(aliases, ", -");
-        aliases = strcat(aliases, option->aliases[i]);
+        sprintf(aliases, "%s, -%s", aliases, option->aliases[i]);
       }
     }
 
@@ -137,14 +136,13 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
     sprintf(label, "%s", option->name);
 
     for (j = 0; j < option->aliases_length; j++) {
-      label = realloc(label, (strlen(label) + strlen(option->aliases[j]) + 3) * sizeof(char));
-      label = strcat(label, ", -");
-      label = strcat(label, option->aliases[j]);
+      label = realloc(label, (strlen(label) + strlen(option->aliases[j]) + 4) * sizeof(char));
+      sprintf(label, "%s, -%s", label, option->aliases[j]);
     }
 
     if (option->requires_value) {
       label = realloc(label, (strlen(label) + 9) * sizeof(char));
-      label = strcat(label, " [value]");
+      sprintf(label, "%s [value]", label);
     }
 
     label = saneopt__pad_right(label, " ", 30);
