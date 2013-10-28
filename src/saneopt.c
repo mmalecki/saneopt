@@ -280,7 +280,8 @@ saneopt_t* saneopt_parse(saneopt_t* saneopt, int argc, char** argv) {
 
   if (argc == 1) {
     saneopt_help(saneopt, NULL);
-    return saneopt;
+    saneopt_free(saneopt);
+    exit(0);
   }
 
   saneopt->argv = argv;
@@ -306,7 +307,8 @@ saneopt_t* saneopt_parse(saneopt_t* saneopt, int argc, char** argv) {
         else {
           saneopt_help(saneopt, NULL);
         }
-        return saneopt;
+        saneopt_free(saneopt);
+        exit(0);
       }
 
       option = saneopt_get(saneopt, argument, 1);
