@@ -99,7 +99,7 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
     for (i = 0; i < option->aliases_length; i++) {
       if (aliases == NULL) {
         aliases = saneopt__allocate(aliases,
-          (strlen(option->aliases[i])) * sizeof(char));
+          (strlen(option->aliases[i]) + 2) * sizeof(char));
         sprintf(aliases, "-%s", option->aliases[i]);
       }
       else {
