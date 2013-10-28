@@ -212,11 +212,11 @@ saneopt_option_t* saneopt_option(saneopt_t* saneopt, char* name) {
   }
 
   if (saneopt->options == NULL) {
-    saneopt->options = malloc(sizeof(saneopt_option_t));
+    saneopt->options = malloc(sizeof(saneopt_option_t*));
   }
   else {
     saneopt->options = realloc(saneopt->options,
-        (saneopt->options_length + 1) * sizeof(saneopt_option_t));
+        (saneopt->options_length + 1) * sizeof(saneopt_option_t*));
   }
 
   saneopt_option_t* option = malloc(sizeof(saneopt_option_t));
