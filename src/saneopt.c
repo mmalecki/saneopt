@@ -96,7 +96,6 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
   char* label = NULL;
 
   if (option != NULL) {
-    printf("Option name: %s\n", option->name);
     for (i = 0; i < option->aliases_length; i++) {
       if (aliases == NULL) {
         aliases = saneopt__allocate(aliases,
@@ -146,7 +145,7 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
   for (i = 0; i < saneopt->options_length; i++) {
     option = saneopt->options[i];
 
-    label = saneopt__allocate(label, strlen(option->name) * sizeof(char));
+    label = saneopt__allocate(label, (strlen(option->name) + 1) * sizeof(char));
     sprintf(label, "%s", option->name);
 
     for (j = 0; j < option->aliases_length; j++) {
