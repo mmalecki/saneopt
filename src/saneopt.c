@@ -100,11 +100,19 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
       }
     }
 
-    if (option->help || option->desc) {
-      if (option->help) {
+    if (option->help) {
+      if (option->requires_value) {
+        printf("--%s [value]\nAliases: %s\n\n%s\n", option->name, aliases, option->help);
+      }
+      else {
         printf("--%s\nAliases: %s\n\n%s\n", option->name, aliases, option->help);
       }
-      else if (option->desc) {
+    }
+    else if (option->desc) {
+      if (option->requires_value) {
+        printf("--%s [value]\nAliases: %s\n\n%s\n", option->name, aliases, option->desc);
+      }
+      else {
         printf("--%s\nAliases: %s\n\n%s\n", option->name, aliases, option->desc);
       }
     }
