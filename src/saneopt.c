@@ -94,8 +94,8 @@ void saneopt_help(saneopt_t* saneopt, saneopt_option_t* option) {
       }
       else {
         aliases = realloc(aliases,
-          (strlen(aliases) + strlen(option->aliases[i]) + 2) * sizeof(char));
-        aliases = strcat(aliases, ", ");
+          (strlen(aliases) + strlen(option->aliases[i]) + 3) * sizeof(char));
+        aliases = strcat(aliases, ", -");
         aliases = strcat(aliases, option->aliases[i]);
       }
     }
