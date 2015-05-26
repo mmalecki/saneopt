@@ -7,13 +7,13 @@ CFLAGS=-g -Wall -Iinclude
 all: libsaneopt.a
 
 libsaneopt.a: $(OBJS)
-	ar rcs $@ $^
+	$(AR) rcs $@ $^
 
 src/%.o: src/%.c
-	gcc $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 test/%: test/%.c libsaneopt.a
-	gcc -L. -lsaneopt $(CFLAGS) $< -o $@
+	$(CC) -L. -lsaneopt $(CFLAGS) $< -o $@
 
 test: libsaneopt.a $(TESTS)
 	MallocScribble=1 test/test-saneopt
