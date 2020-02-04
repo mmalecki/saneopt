@@ -13,7 +13,7 @@ src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test/%: test/%.c libsaneopt.a
-	$(CC) -L. -lsaneopt $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@ -L. -lsaneopt
 
 test: libsaneopt.a $(TESTS)
 	MallocScribble=1 test/test-saneopt
