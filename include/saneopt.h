@@ -1,6 +1,11 @@
 #ifndef _SANEOPT_H
 #define _SANEOPT_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 struct saneopt__alias {
   char* option;
   char* alias;
@@ -57,5 +62,9 @@ char** saneopt_get_all(saneopt_t* opt, char* option);
  * Will result in this function returning ["foo", "bar", "--not-option", "baz"].
  */
 char** saneopt_arguments(saneopt_t* opt);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
