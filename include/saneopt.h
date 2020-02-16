@@ -25,6 +25,11 @@ struct saneopt {
 saneopt_t* saneopt_init(int argc, char** argv);
 
 /*
+ * Release memory allocated by parser.
+ */
+void saneopt_free(saneopt_t* opt);
+
+/*
  * Set an alias from `option` to `alias`.
  * Return -1 on error, 0 on success.
  */

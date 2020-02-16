@@ -13,6 +13,17 @@ saneopt_t* saneopt_init(int argc, char** argv) {
   return saneopt;
 }
 
+void saneopt_free(saneopt_t* opt) {
+  int i;
+  if (opt->aliases) {
+    for (i = 0; opt->aliases && i < opt->alias_count; i++) {
+      free(opt->aliases[i]);
+    }
+    free(opt->aliases);
+  }
+  free(opt);
+}
+
 int saneopt__matches(saneopt_t* opt, char* option, char* arg) {
   int i;
 
