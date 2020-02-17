@@ -13,7 +13,7 @@ void test_no_arg() {
   saneopt_t* opt = saneopt_init(0, argv);
   assert(saneopt_get(opt, "no-option") == NULL);
 
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_no_value() {
@@ -27,7 +27,7 @@ void test_no_value() {
   assert(strcmp(saneopt_get(opt, "option"), "") == 0);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_value() {
@@ -49,7 +49,7 @@ void test_value() {
   assert(strcmp(saneopt_get(opt, "k"), "short-value") == 0);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_long_alias() {
@@ -66,7 +66,7 @@ void test_long_alias() {
   assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_short_alias() {
@@ -82,7 +82,7 @@ void test_short_alias() {
   assert(strcmp(saneopt_get(opt, "option"), "value") == 0);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_stop_after_arguments() {
@@ -101,7 +101,7 @@ void test_stop_after_arguments() {
   assert(saneopt_get(opt, "next-option") == NULL);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_arguments() {
@@ -126,7 +126,7 @@ void test_arguments() {
   assert(args[3] == NULL);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_arguments_first() {
@@ -145,7 +145,7 @@ void test_arguments_first() {
   assert(args[2] == NULL);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_arguments_first_marker() {
@@ -165,7 +165,7 @@ void test_arguments_first_marker() {
   assert(args[2] == NULL);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_arguments_many_markers() {
@@ -195,7 +195,7 @@ void test_arguments_many_markers() {
   assert(args[6] == NULL);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 // https://github.com/mmalecki/saneopt/issues/2
@@ -220,7 +220,7 @@ void test_arguments_issue_2() {
   assert(args[2] == NULL);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 // https://github.com/mmalecki/saneopt/issues/3
@@ -247,7 +247,7 @@ void test_arguments_issue_3() {
   assert(args[3] == NULL);
 
   free(argv);
-  free(opt);
+  saneopt_free(opt);
 }
 
 void test_all() {
@@ -272,8 +272,8 @@ void test_all() {
   assert(args[3] == NULL);
 
   free(argv);
-  free(opt);
   free(args);
+  saneopt_free(opt);
 }
 
 int main(int argc, char** argv) {
