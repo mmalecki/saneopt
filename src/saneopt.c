@@ -24,7 +24,7 @@ void saneopt_free(saneopt_t* opt) {
   free(opt);
 }
 
-int saneopt__matches(saneopt_t* opt, char* option, char* arg) {
+int saneopt__matches(saneopt_t* opt, const char* option, const char* arg) {
   int i;
 
   if (strncmp(arg, "--", 2) == 0) {
@@ -61,7 +61,7 @@ int saneopt__matches(saneopt_t* opt, char* option, char* arg) {
   return 0;
 }
 
-int saneopt_alias(saneopt_t* opt, char* option, char* alias) {
+int saneopt_alias(saneopt_t* opt, const char* option, const char* alias) {
   saneopt__alias_t** aliases;
   saneopt__alias_t* alias_ = malloc(sizeof(saneopt__alias_t));
 
@@ -82,7 +82,7 @@ int saneopt_alias(saneopt_t* opt, char* option, char* alias) {
   return 0;
 }
 
-char* saneopt_get(saneopt_t* opt, char* option) {
+char* saneopt_get(saneopt_t* opt, const char* option) {
   int i;
   char* arg;
 
@@ -102,7 +102,7 @@ char* saneopt_get(saneopt_t* opt, char* option) {
   return NULL;
 }
 
-char** saneopt_get_all(saneopt_t* opt, char* option) {
+char** saneopt_get_all(saneopt_t* opt, const char* option) {
   int i;
   int count = 0;
   char* arg;
